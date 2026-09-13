@@ -315,30 +315,35 @@ hcl trust "reviewed 2026-08-30: static address until the provider gap closes" {
 (source_file
   (hcl_block
     (hcl_body
-      (hcl_text)
-      (hcl_string)
-      (hcl_string)
-      (hcl_body
+      (hcl_content
         (hcl_text)
         (hcl_string)
-        (comment)
-        (hcl_text)
+        (hcl_string)
         (hcl_body
-          (hcl_string)
-          (hcl_text)
-          (hcl_string))
-        (comment))))
+          (hcl_content
+            (hcl_text)
+            (hcl_string)
+            (comment)
+            (hcl_text)
+            (hcl_body
+              (hcl_content
+                (hcl_string)
+                (hcl_text)
+                (hcl_string))))
+          (comment)))))
   (hcl_block
     (string
       (string_content))
     (hcl_body
       (comment)
-      (hcl_text)
-      (hcl_string)
-      (hcl_string)
-      (hcl_body
+      (hcl_content
         (hcl_text)
-        (hcl_string)))))
+        (hcl_string)
+        (hcl_string)
+        (hcl_body
+          (hcl_content
+            (hcl_text)
+            (hcl_string)))))))
 
 ==================
 hcl stays an ordinary key inside a body

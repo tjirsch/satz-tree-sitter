@@ -88,7 +88,10 @@ export default grammar({
     // hcl [trust "reason"] { raw HCL, brace-balanced }
     hcl_block: ($) =>
       seq("hcl", optional(seq("trust", field("reason", $.string))), field("body", $.hcl_body)),
-    hcl_body: ($) => seq("{", repeat(choice($.hcl_body, $.hcl_string, $.hcl_text)), "}"),
+    // hcl_content is one node over everything between the braces, so an editor
+    // can hand exactly that text to an HCL grammar.
+    hcl_body: ($) => seq("{", optional($.hcl_content), "}"),
+    hcl_content: ($) => repeat1(choice($.hcl_body, $.hcl_string, $.hcl_text)),
     hcl_string: (_) => token(seq('"', repeat(choice(/[^"\\\n]/, /\\./)), '"')),
     // Any run that opens neither a brace, a string nor a comment; a lone `/`
     // that is not `//` or `/*` is text too.

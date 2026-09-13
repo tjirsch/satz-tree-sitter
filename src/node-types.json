@@ -239,8 +239,23 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": false,
+      "types": [
+        {
+          "type": "hcl_content",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "hcl_content",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
       "types": [
         {
           "type": "hcl_body",

@@ -450,30 +450,42 @@
           "value": "{"
         },
         {
-          "type": "REPEAT",
-          "content": {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "hcl_body"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "hcl_string"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "hcl_text"
-              }
-            ]
-          }
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "hcl_content"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         },
         {
           "type": "STRING",
           "value": "}"
         }
       ]
+    },
+    "hcl_content": {
+      "type": "REPEAT1",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "hcl_body"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "hcl_string"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "hcl_text"
+          }
+        ]
+      }
     },
     "hcl_string": {
       "type": "TOKEN",
