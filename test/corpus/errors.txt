@@ -1,0 +1,23 @@
+==================
+An unterminated string does not swallow the file
+:error
+==================
+
+a = "open
+b = 1
+
+---
+
+(source_file)
+
+==================
+An unknown escape is an error
+:error
+==================
+
+a = "tab\tno"
+b = 1
+
+---
+
+(source_file)

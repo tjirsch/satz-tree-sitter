@@ -1,0 +1,17 @@
+{
+  "name": "satz-tree-sitter",
+  "version": "0.1.0",
+  "description": "Satz grammar for tree-sitter",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tjirsch/satz-tree-sitter.git"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Thomas Jirsch"
+  },
+  "devDependencies": {
+    "tree-sitter-cli": "^0.27.0"
+  }
+}

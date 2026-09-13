@@ -1,0 +1,31 @@
+{
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/config.schema.json",
+  "grammars": [
+    {
+      "name": "satz",
+      "camelcase": "Satz",
+      "title": "Satz",
+      "scope": "source.satz",
+      "path": ".",
+      "file-types": ["satz"]
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "Satz grammar for tree-sitter",
+    "authors": [{ "name": "Thomas Jirsch" }],
+    "links": { "repository": "https://github.com/tjirsch/satz-tree-sitter" }
+  },
+  "bindings": {
+    "c": false,
+    "go": false,
+    "java": false,
+    "kotlin": false,
+    "node": false,
+    "python": false,
+    "rust": false,
+    "swift": false,
+    "zig": false
+  }
+}

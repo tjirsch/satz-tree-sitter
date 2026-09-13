@@ -1,0 +1,124 @@
+==================
+Escapes, brace escape, lone closing brace, interpolation
+==================
+
+a = "resource.name.startsWith(\"projects/_/buckets/{customer_shortname}-audit-logs\")"
+b = "${{google_storage_bucket.audit_logs.name}}"
+c = "{{\"allowedDomains\" : [\"@{customer_domain}\"]}}"
+d = "a}b"
+e = "line\nbreak\\slash"
+
+---
+
+(source_file
+  (attribute
+    (identifier)
+    (string
+      (string_content)
+      (escape_sequence)
+      (string_content)
+      (interpolation
+        (parameter))
+      (string_content)
+      (escape_sequence)
+      (string_content)))
+  (attribute
+    (identifier)
+    (string
+      (string_content)
+      (escape_sequence)
+      (string_content)))
+  (attribute
+    (identifier)
+    (string
+      (escape_sequence)
+      (escape_sequence)
+      (string_content)
+      (escape_sequence)
+      (string_content)
+      (escape_sequence)
+      (string_content)
+      (interpolation
+        (parameter))
+      (escape_sequence)
+      (string_content)))
+  (attribute
+    (identifier)
+    (string
+      (string_content)))
+  (attribute
+    (identifier)
+    (string
+      (string_content)
+      (escape_sequence)
+      (string_content)
+      (escape_sequence)
+      (string_content))))
+
+==================
+A string that starts like a comment is a string
+==================
+
+a = "//cloudresourcemanager.googleapis.com/organizations/{customer_organization_id}"
+b = "#not-a-comment"
+c = "{p}//not-a-comment"
+
+---
+
+(source_file
+  (attribute
+    (identifier)
+    (string
+      (string_content)
+      (interpolation
+        (parameter))))
+  (attribute
+    (identifier)
+    (string
+      (string_content)))
+  (attribute
+    (identifier)
+    (string
+      (interpolation
+        (parameter))
+      (string_content))))
+
+==================
+Triple-quoted string: newlines, a literal backslash, interpolation
+==================
+
+a = """
+  first line \n stays two characters
+  {customer_domain} interpolates, {{ is a brace
+"""
+
+---
+
+(source_file
+  (attribute
+    (identifier)
+    (string
+      (string_content)
+      (interpolation
+        (parameter))
+      (string_content)
+      (escape_sequence)
+      (string_content))))
+
+==================
+Empty strings and a string of one space
+==================
+
+a = ""
+b = " "
+
+---
+
+(source_file
+  (attribute
+    (identifier)
+    (string))
+  (attribute
+    (identifier)
+    (string
+      (string_content))))

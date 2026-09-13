@@ -1,0 +1,29 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+  schedule:
+    # Weekly: the satz language may have moved since the grammar last did.
+    - cron: "17 6 * * 1"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install the tree-sitter CLI
+        run: npm install -g tree-sitter-cli@0.27.0
+      - name: Generated sources are current
+        run: |
+          tree-sitter generate
+          git diff --exit-code -- src
+      - name: Grammar tests
+        run: tree-sitter test
+      - name: Parse the satz corpus
+        run: |
+          git clone --depth 1 https://github.com/tjirsch/satz "$RUNNER_TEMP/satz"
+          scripts/parse-corpus.sh "$RUNNER_TEMP/satz"

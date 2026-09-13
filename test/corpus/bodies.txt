@@ -1,0 +1,221 @@
+==================
+Resource map, nested types, named entries with identifier and string names
+==================
+
+google_folder {
+  infra {
+    display_name = "Infrastructure"
+    google_project {
+      infra {
+        project_id = infra_project_name
+      }
+    }
+  }
+}
+google_org_policy_policy {
+  "compute-managed-requireOsLogin" {
+    spec {
+      reset = true
+    }
+  }
+}
+
+---
+
+(source_file
+  (block
+    (identifier)
+    (body
+      (block
+        (identifier)
+        (body
+          (attribute
+            (identifier)
+            (string
+              (string_content)))
+          (block
+            (identifier)
+            (body
+              (block
+                (identifier)
+                (body
+                  (attribute
+                    (identifier)
+                    (reference))))))))))
+  (block
+    (identifier)
+    (body
+      (block
+        (string
+          (string_content))
+        (body
+          (block
+            (identifier)
+            (body
+              (attribute
+                (identifier)
+                (boolean)))))))))
+
+==================
+Two-label block form, quoted attribute keys, interpolated keys
+==================
+
+google_folder "x" {
+  "import-id" = "folders/123456789012"
+}
+google_organization_iam_member {
+  "group:gcp-auditors@{customer_domain}" = [
+    "roles/browser",
+    { role = "roles/storage.objectViewer" condition { title = "t" } },
+  ]
+}
+
+---
+
+(source_file
+  (block
+    (identifier)
+    (string
+      (string_content))
+    (body
+      (attribute
+        (string
+          (string_content))
+        (string
+          (string_content)))))
+  (block
+    (identifier)
+    (body
+      (attribute
+        (string
+          (string_content)
+          (interpolation
+            (parameter)))
+        (list
+          (string
+            (string_content))
+          (object
+            (attribute
+              (identifier)
+              (string
+                (string_content)))
+            (block
+              (identifier)
+              (body
+                (attribute
+                  (identifier)
+                  (string
+                    (string_content)))))))))))
+
+==================
+Lists: commas optional, trailing comma, empty, objects with blocks inside
+==================
+
+a = []
+b = [ "x" "y" ]
+c = [
+  "x",
+  "y",
+]
+lifecycle_rule = [
+  {
+    action { type = "Delete" }
+    condition { age = audit_retention_days }
+  },
+]
+
+---
+
+(source_file
+  (attribute
+    (identifier)
+    (list))
+  (attribute
+    (identifier)
+    (list
+      (string
+        (string_content))
+      (string
+        (string_content))))
+  (attribute
+    (identifier)
+    (list
+      (string
+        (string_content))
+      (string
+        (string_content))))
+  (attribute
+    (identifier)
+    (list
+      (object
+        (block
+          (identifier)
+          (body
+            (attribute
+              (identifier)
+              (string
+                (string_content)))))
+        (block
+          (identifier)
+          (body
+            (attribute
+              (identifier)
+              (reference))))))))
+
+==================
+Bare string-keyed block and top-level attribute (fragment packs)
+==================
+
+"iam-allowedPolicyMemberDomains-superseded" {
+  spec {
+    reset = true
+  }
+}
+essential_contacts_allowed_domains = ["@{customer_domain}"]
+
+---
+
+(source_file
+  (block
+    (string
+      (string_content))
+    (body
+      (block
+        (identifier)
+        (body
+          (attribute
+            (identifier)
+            (boolean))))))
+  (attribute
+    (identifier)
+    (list
+      (string
+        (string_content)
+        (interpolation
+          (parameter))))))
+
+==================
+Comments in all three forms
+==================
+
+// line
+# hash
+/* block
+   spanning */
+x = 1 // trailing
+y = 2 # trailing
+
+---
+
+(source_file
+  (comment)
+  (comment)
+  (comment)
+  (attribute
+    (identifier)
+    (number))
+  (comment)
+  (attribute
+    (identifier)
+    (number))
+  (comment))

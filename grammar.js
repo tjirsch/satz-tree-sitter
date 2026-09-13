@@ -1,0 +1,180 @@
+/**
+ * @file Satz grammar for tree-sitter
+ * @author Thomas Jirsch
+ * @license MIT
+ *
+ * Mirrors the hand-written lexer and parser in satz (crates/satz-core/src/satz.rs):
+ * ten token kinds, no operators, every keyword contextual. The `hcl { … }` body is
+ * raw HCL kept brace-balanced here the way satz's scan_hcl_body keeps it — strings
+ * and comments are stepped over; heredocs are not (none exist in the corpus).
+ */
+
+/// <reference types="tree-sitter-cli/dsl" />
+// @ts-check
+
+export default grammar({
+  name: "satz",
+
+  extras: ($) => [/\s/, $.comment],
+
+  // Every keyword is an identifier that the lexer promotes only where the
+  // keyword is valid — `action { type = "Delete" }` inside a body stays a key.
+  word: ($) => $.identifier,
+
+  rules: {
+    source_file: ($) => repeat($._item),
+
+    _item: ($) =>
+      choice(
+        $.header,
+        $.params,
+        $.use_statement,
+        $.claim,
+        $.question,
+        $.action,
+        $.suppress,
+        $.hcl_block,
+        $.attribute,
+        $.block,
+      ),
+
+    // estate NAME | pack NAME [version "…"] [content]
+    header: ($) =>
+      seq(
+        field("kind", choice("estate", "pack")),
+        field("name", $.identifier),
+        repeat(choice("content", seq("version", field("version", $.string)))),
+      ),
+
+    params: ($) => seq("params", "{", repeat($.param), "}"),
+    param: ($) => seq(field("name", $.identifier), "=", field("value", $._value)),
+
+    use_statement: ($) =>
+      seq(
+        "use",
+        field("path", $.string),
+        repeat(
+          choice(
+            seq("as", field("type", $.identifier)),
+            seq("when", field("condition", $.identifier)),
+          ),
+        ),
+      ),
+
+    claim: ($) =>
+      seq(
+        "claim",
+        field("framework", $.string),
+        field("version", $.string),
+        field("control", $.string),
+        field("coverage", $.coverage),
+        field("body", $.body),
+      ),
+    coverage: (_) => choice("implements", "contributes", "deviates"),
+
+    question: ($) =>
+      seq("question", optional("oneof"), field("name", $.identifier), field("body", $.body)),
+
+    action: ($) => seq("action", field("name", $.string), field("body", $.body)),
+
+    suppress: ($) =>
+      seq(
+        "suppress",
+        field("type", $.identifier),
+        field("name", $.string),
+        optional(seq("role", field("role", $.string))),
+      ),
+
+    // hcl [trust "reason"] { raw HCL, brace-balanced }
+    hcl_block: ($) =>
+      seq("hcl", optional(seq("trust", field("reason", $.string))), field("body", $.hcl_body)),
+    hcl_body: ($) => seq("{", repeat(choice($.hcl_body, $.hcl_string, $.hcl_text)), "}"),
+    hcl_string: (_) => token(seq('"', repeat(choice(/[^"\\\n]/, /\\./)), '"')),
+    // Any run that opens neither a brace, a string nor a comment; a lone `/`
+    // that is not `//` or `/*` is text too.
+    hcl_text: (_) => token(prec(-1, choice(/[^{}"#\/\s][^{}"#\/]*/, /\/[^\/*{}"#]/))),
+
+    body: ($) => seq("{", repeat($._entry), "}"),
+    _entry: ($) => choice($.attribute, $.block, $.use_statement),
+
+    attribute: ($) => seq(field("key", $._key), "=", field("value", $._value)),
+    // KEY [NAME] { … } — a resource map, a named map entry, a nested mapping;
+    // the provider schema, not the syntax, decides which.
+    block: ($) =>
+      seq(field("key", $._key), optional(field("name", $._key)), field("body", $.body)),
+    _key: ($) => choice($.identifier, $.string),
+
+    _value: ($) =>
+      choice(
+        $.string,
+        $.number,
+        $.boolean,
+        alias($.identifier, $.reference),
+        $.list,
+        alias($.body, $.object),
+      ),
+
+    // Commas are optional between list items, as in the lexer.
+    list: ($) => seq("[", repeat(seq($._value, optional(","))), "]"),
+
+    boolean: (_) => choice("true", "false"),
+
+    number: (_) => /-?[0-9]+(\.[0-9]+)?/,
+
+    // The dot belongs to the identifier: `monitoring.audit_logsink` is one name.
+    identifier: (_) => /[A-Za-z_][A-Za-z0-9_.]*/,
+
+    string: ($) => choice($._single_string, $._triple_string),
+
+    // "…" — escapes \n \" \\ only; {{ is a literal brace; a lone } is literal;
+    // {name} interpolates a param.
+    _single_string: ($) =>
+      seq(
+        '"',
+        repeat(
+          choice(
+            alias(token.immediate(prec(1, /[^"\\{\n]+/)), $.string_content),
+            $.escape_sequence,
+            $.interpolation,
+          ),
+        ),
+        token.immediate('"'),
+      ),
+    // `{{` is the escape for a literal brace; content stops at every `{` so
+    // that a comment-shaped string (`"//…{p}"`) can never be lexed as a comment.
+    escape_sequence: (_) => token.immediate(prec(1, choice(/\\[n"\\]/, "{{"))),
+
+    // """…""" — no escapes (a backslash is literal), same {{ and {name} rules.
+    _triple_string: ($) =>
+      seq(
+        '"""',
+        repeat(
+          choice(
+            alias(
+              token.immediate(prec(1, /([^"{]|"[^"{]|""[^"{])+/)),
+              $.string_content,
+            ),
+            alias(token.immediate(prec(1, "{{")), $.escape_sequence),
+            $.interpolation,
+          ),
+        ),
+        token.immediate('"""'),
+      ),
+
+    interpolation: ($) =>
+      seq(
+        token.immediate("{"),
+        field("parameter", alias(token.immediate(/[A-Za-z0-9_]+/), $.parameter)),
+        token.immediate("}"),
+      ),
+
+    comment: (_) =>
+      token(
+        choice(
+          seq("//", /.*/),
+          seq("#", /.*/),
+          seq("/*", /[^*]*\*+([^/*][^*]*\*+)*/, "/"),
+        ),
+      ),
+  },
+});

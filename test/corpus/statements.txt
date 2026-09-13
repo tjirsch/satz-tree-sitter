@@ -1,0 +1,368 @@
+==================
+Estate header and params
+==================
+
+// The header names the estate; params bind the values a pack asks for.
+estate acme
+
+params {
+  customer_domain = "example.com"
+  retention_days  = 400            # a number
+  want_optional   = false
+  ratio           = 0.5
+  offset          = -3
+}
+
+---
+
+(source_file
+  (comment)
+  (header
+    (identifier))
+  (params
+    (param
+      (identifier)
+      (string
+        (string_content)))
+    (param
+      (identifier)
+      (number))
+    (comment)
+    (param
+      (identifier)
+      (boolean))
+    (param
+      (identifier)
+      (number))
+    (param
+      (identifier)
+      (number))))
+
+==================
+Pack header with version and content
+==================
+
+pack monitoring.audit_logsink version "1.4" content
+
+---
+
+(source_file
+  (header
+    (identifier)
+    (string
+      (string_content))))
+
+==================
+use in its three forms, and nested in a body
+==================
+
+use "acme-pack.satz"
+use "acme-policies.satz" as google_org_policy_policy
+use "acme-optional.satz" when want_optional
+google_org_policy_policy {
+  use "presets/CIS-GCP-Foundation-4.0.satz"
+}
+
+---
+
+(source_file
+  (use_statement
+    (string
+      (string_content)))
+  (use_statement
+    (string
+      (string_content))
+    (identifier))
+  (use_statement
+    (string
+      (string_content))
+    (identifier))
+  (block
+    (identifier)
+    (body
+      (use_statement
+        (string
+          (string_content))))))
+
+==================
+suppress with and without role
+==================
+
+suppress google_org_policy_policy "compute-managed-vmExternalIpAccess"
+suppress google_organization_iam_member "group:gcp-auditors@{customer_domain}" role "roles/browser"
+
+---
+
+(source_file
+  (suppress
+    (identifier)
+    (string
+      (string_content)))
+  (suppress
+    (identifier)
+    (string
+      (string_content)
+      (interpolation
+        (parameter)))
+    (string
+      (string_content))))
+
+==================
+claim with each coverage word
+==================
+
+claim "cis-gcp" "4.0" "5.1" implements {
+  resources      = ["google_storage_bucket.audit_logs"]
+  interpretation = "Uniform bucket-level access on the audit bucket."
+  duty_public_check = "Confirm public_access_prevention is enforced."
+}
+claim "cis-gcp" "4.0" "5.2" contributes {
+  resources = ["google_storage_bucket.audit_logs"]
+}
+claim "cis-gcp" "4.0" "4.4" deviates {
+  resources = ["google_org_policy_policy.compute_managed_requireOsLogin"]
+  reason    = "A service here depends on metadata SSH keys."
+}
+
+---
+
+(source_file
+  (claim
+    (string
+      (string_content))
+    (string
+      (string_content))
+    (string
+      (string_content))
+    (coverage)
+    (body
+      (attribute
+        (identifier)
+        (list
+          (string
+            (string_content))))
+      (attribute
+        (identifier)
+        (string
+          (string_content)))
+      (attribute
+        (identifier)
+        (string
+          (string_content)))))
+  (claim
+    (string
+      (string_content))
+    (string
+      (string_content))
+    (string
+      (string_content))
+    (coverage)
+    (body
+      (attribute
+        (identifier)
+        (list
+          (string
+            (string_content))))))
+  (claim
+    (string
+      (string_content))
+    (string
+      (string_content))
+    (string
+      (string_content))
+    (coverage)
+    (body
+      (attribute
+        (identifier)
+        (list
+          (string
+            (string_content))))
+      (attribute
+        (identifier)
+        (string
+          (string_content))))))
+
+==================
+question, question oneof with options
+==================
+
+question default_region {
+  prompt    = "Which region should regional resources default to?"
+  reversal  = state_surgery
+  blast     = low
+  recommend = "europe-west3"
+}
+question oneof group_model {
+  prompt   = "Which security-group model does this customer run?"
+  required = true
+  option group_model_flat  { label = "Flat" }
+  option group_model_split { label = "Split" why = "A distinct network team." }
+}
+
+---
+
+(source_file
+  (question
+    (identifier)
+    (body
+      (attribute
+        (identifier)
+        (string
+          (string_content)))
+      (attribute
+        (identifier)
+        (reference))
+      (attribute
+        (identifier)
+        (reference))
+      (attribute
+        (identifier)
+        (string
+          (string_content)))))
+  (question
+    (identifier)
+    (body
+      (attribute
+        (identifier)
+        (string
+          (string_content)))
+      (attribute
+        (identifier)
+        (boolean))
+      (block
+        (identifier)
+        (identifier)
+        (body
+          (attribute
+            (identifier)
+            (string
+              (string_content)))))
+      (block
+        (identifier)
+        (identifier)
+        (body
+          (attribute
+            (identifier)
+            (string
+              (string_content)))
+          (attribute
+            (identifier)
+            (string
+              (string_content))))))))
+
+==================
+action
+==================
+
+action "scc-services" {
+  reason       = "no google_* resource exists for it"
+  run          = "scripts/scc-services.sh"
+  args         = ["--organization", "{customer_organization_id}"]
+  execute_args = ["--apply"]
+  phase        = "before-apply"
+}
+
+---
+
+(source_file
+  (action
+    (string
+      (string_content))
+    (body
+      (attribute
+        (identifier)
+        (string
+          (string_content)))
+      (attribute
+        (identifier)
+        (string
+          (string_content)))
+      (attribute
+        (identifier)
+        (list
+          (string
+            (string_content))
+          (string
+            (interpolation
+              (parameter)))))
+      (attribute
+        (identifier)
+        (list
+          (string
+            (string_content))))
+      (attribute
+        (identifier)
+        (string
+          (string_content))))))
+
+==================
+hcl passthrough, bare and trusted, with nested braces, strings and comments
+==================
+
+hcl {
+  resource "google_compute_address" "legacy_ip" {
+    name = "legacy-ip" // a comment inside
+    labels = { "a" = "}" } # braces in strings do not count
+  }
+}
+hcl trust "reviewed 2026-08-30: static address until the provider gap closes" {
+  /* block comment */
+  resource "google_compute_address" "b" { region = "europe-west3" }
+}
+
+---
+
+(source_file
+  (hcl_block
+    (hcl_body
+      (hcl_text)
+      (hcl_string)
+      (hcl_string)
+      (hcl_body
+        (hcl_text)
+        (hcl_string)
+        (comment)
+        (hcl_text)
+        (hcl_body
+          (hcl_string)
+          (hcl_text)
+          (hcl_string))
+        (comment))))
+  (hcl_block
+    (string
+      (string_content))
+    (hcl_body
+      (comment)
+      (hcl_text)
+      (hcl_string)
+      (hcl_string)
+      (hcl_body
+        (hcl_text)
+        (hcl_string)))))
+
+==================
+hcl stays an ordinary key inside a body
+==================
+
+google_thing {
+  hcl = "not a block"
+  action { type = "Delete" }
+}
+
+---
+
+(source_file
+  (block
+    (identifier)
+    (body
+      (attribute
+        (identifier)
+        (string
+          (string_content)))
+      (block
+        (identifier)
+        (body
+          (attribute
+            (identifier)
+            (string
+              (string_content))))))))
