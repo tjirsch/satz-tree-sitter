@@ -296,6 +296,37 @@ action "scc-services" {
           (string_content))))))
 
 ==================
+notice
+==================
+
+notice cis_baseline_adopted {
+  text   = "Run satz adopt once, so the policies Google set already are imported."
+  run    = "satz adopt {customer_shortname}.satz --execute --import"
+  before = apply
+}
+
+---
+
+(source_file
+  (notice
+    (identifier)
+    (body
+      (attribute
+        (identifier)
+        (string
+          (string_content)))
+      (attribute
+        (identifier)
+        (string
+          (string_content)
+          (interpolation
+            (parameter))
+          (string_content)))
+      (attribute
+        (identifier)
+        (reference)))))
+
+==================
 hcl passthrough, bare and trusted, with nested braces, strings and comments
 ==================
 

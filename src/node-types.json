@@ -364,6 +364,32 @@
     }
   },
   {
+    "type": "notice",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "body",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "object",
     "named": true,
     "fields": {},
@@ -504,6 +530,10 @@
         },
         {
           "type": "header",
+          "named": true
+        },
+        {
+          "type": "notice",
           "named": true
         },
         {
@@ -703,6 +733,10 @@
   },
   {
     "type": "implements",
+    "named": false
+  },
+  {
+    "type": "notice",
     "named": false
   },
   {
