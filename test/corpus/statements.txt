@@ -327,6 +327,36 @@ notice cis_baseline_adopted {
         (reference)))))
 
 ==================
+offers
+==================
+
+offers "presets/cis/CIS-GCP-Foundation-4.0.satz" {
+  when     = use_cis_baseline
+  phase    = "once the map is in"
+  requires = ["presets/estate-core.satz"]
+}
+
+---
+
+(source_file
+  (offers
+    (string
+      (string_content))
+    (body
+      (attribute
+        (identifier)
+        (reference))
+      (attribute
+        (identifier)
+        (string
+          (string_content)))
+      (attribute
+        (identifier)
+        (list
+          (string
+            (string_content)))))))
+
+==================
 hcl passthrough, bare and trusted, with nested braces, strings and comments
 ==================
 

@@ -43,6 +43,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "offers"
+        },
+        {
+          "type": "SYMBOL",
           "name": "suppress"
         },
         {
@@ -367,6 +371,31 @@
           "content": {
             "type": "SYMBOL",
             "name": "identifier"
+          }
+        },
+        {
+          "type": "FIELD",
+          "name": "body",
+          "content": {
+            "type": "SYMBOL",
+            "name": "body"
+          }
+        }
+      ]
+    },
+    "offers": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "offers"
+        },
+        {
+          "type": "FIELD",
+          "name": "path",
+          "content": {
+            "type": "SYMBOL",
+            "name": "string"
           }
         },
         {
