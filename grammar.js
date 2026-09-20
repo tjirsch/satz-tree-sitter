@@ -32,6 +32,7 @@ export default grammar({
         $.claim,
         $.question,
         $.action,
+        $.notice,
         $.suppress,
         $.hcl_block,
         $.attribute,
@@ -76,6 +77,10 @@ export default grammar({
       seq("question", optional("oneof"), field("name", $.identifier), field("body", $.body)),
 
     action: ($) => seq("action", field("name", $.string), field("body", $.body)),
+
+    // notice PARAM { text run before } — what to run once the pack is switched on,
+    // acknowledged when the estate binds PARAM = true
+    notice: ($) => seq("notice", field("name", $.identifier), field("body", $.body)),
 
     suppress: ($) =>
       seq(
