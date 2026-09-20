@@ -413,6 +413,32 @@
     }
   },
   {
+    "type": "offers",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "body",
+            "named": true
+          }
+        ]
+      },
+      "path": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "string",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "param",
     "named": true,
     "fields": {
@@ -534,6 +560,10 @@
         },
         {
           "type": "notice",
+          "named": true
+        },
+        {
+          "type": "offers",
           "named": true
         },
         {
@@ -742,6 +772,10 @@
   {
     "type": "number",
     "named": true
+  },
+  {
+    "type": "offers",
+    "named": false
   },
   {
     "type": "oneof",

@@ -33,6 +33,7 @@ export default grammar({
         $.question,
         $.action,
         $.notice,
+        $.offers,
         $.suppress,
         $.hcl_block,
         $.attribute,
@@ -81,6 +82,10 @@ export default grammar({
     // notice PARAM { text run before } — what to run once the pack is switched on,
     // acknowledged when the estate binds PARAM = true
     notice: ($) => seq("notice", field("name", $.identifier), field("body", $.body)),
+
+    // offers "presets/x.satz" { when phase block after_scaffold by_hand requires
+    // excludes } — one entry per pack the library offers, read by `satz pack-graph`
+    offers: ($) => seq("offers", field("path", $.string), field("body", $.body)),
 
     suppress: ($) =>
       seq(
