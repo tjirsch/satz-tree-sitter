@@ -40,12 +40,12 @@ export default grammar({
         $.block,
       ),
 
-    // estate NAME | pack NAME [version "…"] [content]
+    // estate NAME | pack NAME [version "…"]
     header: ($) =>
       seq(
         field("kind", choice("estate", "pack")),
         field("name", $.identifier),
-        repeat(choice("content", seq("version", field("version", $.string)))),
+        optional(seq("version", field("version", $.string))),
       ),
 
     params: ($) => seq("params", "{", repeat($.param), "}"),

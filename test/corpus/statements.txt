@@ -39,10 +39,10 @@ params {
       (number))))
 
 ==================
-Pack header with version and content
+Pack header with version
 ==================
 
-pack monitoring.audit_logsink version "1.4" content
+pack monitoring.audit_logsink version "1.4"
 
 ---
 
