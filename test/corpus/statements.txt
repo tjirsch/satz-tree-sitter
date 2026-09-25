@@ -422,6 +422,23 @@ interface "team-a" {
             (string_content)))))))
 
 ==================
+export of every resource of a type
+==================
+
+export "folders" = all google_folder description "d"
+
+---
+
+(source_file
+  (export
+    (string
+      (string_content))
+    (all_resources
+      (identifier))
+    (string
+      (string_content))))
+
+==================
 export with attach points
 ==================
 

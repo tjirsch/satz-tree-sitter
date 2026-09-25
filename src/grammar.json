@@ -435,8 +435,17 @@
           "type": "FIELD",
           "name": "value",
           "content": {
-            "type": "SYMBOL",
-            "name": "_value"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "all_resources"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_value"
+              }
+            ]
           }
         },
         {
@@ -479,6 +488,23 @@
                 ]
               }
             ]
+          }
+        }
+      ]
+    },
+    "all_resources": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "all"
+        },
+        {
+          "type": "FIELD",
+          "name": "type",
+          "content": {
+            "type": "SYMBOL",
+            "name": "identifier"
           }
         }
       ]

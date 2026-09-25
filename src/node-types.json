@@ -26,6 +26,22 @@
     }
   },
   {
+    "type": "all_resources",
+    "named": true,
+    "fields": {
+      "type": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "attribute",
     "named": true,
     "fields": {
@@ -246,6 +262,10 @@
         "multiple": false,
         "required": true,
         "types": [
+          {
+            "type": "all_resources",
+            "named": true
+          },
           {
             "type": "boolean",
             "named": true
@@ -855,6 +875,10 @@
   },
   {
     "type": "action",
+    "named": false
+  },
+  {
+    "type": "all",
     "named": false
   },
   {
