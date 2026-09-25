@@ -390,6 +390,38 @@ export "regions" = ["europe-west3", "europe-west4"]
         (string_content)))))
 
 ==================
+interface
+==================
+
+interface "team-a" {
+  export "team_folder" = "${{google_folder.team_a.name}}" description "Team A's folder"
+  export "regions"     = ["europe-west3"]
+}
+
+---
+
+(source_file
+  (interface
+    (string
+      (string_content))
+    (interface_body
+      (export
+        (string
+          (string_content))
+        (string
+          (string_content)
+          (escape_sequence)
+          (string_content))
+        (string
+          (string_content)))
+      (export
+        (string
+          (string_content))
+        (list
+          (string
+            (string_content)))))))
+
+==================
 hcl passthrough, bare and trusted, with nested braces, strings and comments
 ==================
 
