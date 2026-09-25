@@ -98,7 +98,7 @@ export default grammar({
         "export",
         field("name", $.string),
         "=",
-        field("value", $._value),
+        field("value", choice($.all_resources, $._value)),
         repeat(
           choice(
             seq("attach", field("attach", $.list)),
@@ -106,6 +106,9 @@ export default grammar({
           ),
         ),
       ),
+
+    // all TYPE — every resource of one type, as a map keyed by label
+    all_resources: ($) => seq("all", field("type", $.identifier)),
 
     // interface "NAME" { export … use interface … } — one team's exports, written to
     // their own module hcl/interfaces/NAME/ beside the core exports; the body holds
