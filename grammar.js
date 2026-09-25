@@ -35,6 +35,7 @@ export default grammar({
         $.notice,
         $.offers,
         $.export,
+        $.interface,
         $.suppress,
         $.hcl_block,
         $.attribute,
@@ -98,6 +99,12 @@ export default grammar({
         field("value", $._value),
         optional(seq("description", field("description", $.string))),
       ),
+
+    // interface "NAME" { export … } — one team's exports, written to their own module
+    // hcl/interfaces/NAME/ beside the core exports; the body holds exports only
+    interface: ($) =>
+      seq("interface", field("name", $.string), field("body", $.interface_body)),
+    interface_body: ($) => seq("{", repeat($.export), "}"),
 
     suppress: ($) =>
       seq(
