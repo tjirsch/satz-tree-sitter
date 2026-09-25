@@ -212,8 +212,18 @@
     "type": "export",
     "named": true,
     "fields": {
+      "attach": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "list",
+            "named": true
+          }
+        ]
+      },
       "description": {
-        "multiple": false,
+        "multiple": true,
         "required": false,
         "types": [
           {
@@ -849,6 +859,10 @@
   },
   {
     "type": "as",
+    "named": false
+  },
+  {
+    "type": "attach",
     "named": false
   },
   {

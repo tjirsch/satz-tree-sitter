@@ -422,6 +422,37 @@ interface "team-a" {
             (string_content)))))))
 
 ==================
+export with attach points
+==================
+
+export "vpc" = "v" attach ["google_compute_shared_vpc_service_project"] description "d"
+export "p" = "x" description "d" attach ["google_project_iam_member"]
+
+---
+
+(source_file
+  (export
+    (string
+      (string_content))
+    (string
+      (string_content))
+    (list
+      (string
+        (string_content)))
+    (string
+      (string_content)))
+  (export
+    (string
+      (string_content))
+    (string
+      (string_content))
+    (string
+      (string_content))
+    (list
+      (string
+        (string_content)))))
+
+==================
 interface using others
 ==================
 
