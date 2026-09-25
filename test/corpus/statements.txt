@@ -357,6 +357,39 @@ offers "presets/cis/CIS-GCP-Foundation-4.0.satz" {
             (string_content)))))))
 
 ==================
+export
+==================
+
+export "customer_organization_id" = customer_organization_id description "The organisation id"
+export "infra_folder" = "${{google_folder.infra_folder.name}}"
+export "regions" = ["europe-west3", "europe-west4"]
+
+---
+
+(source_file
+  (export
+    (string
+      (string_content))
+    (reference)
+    (string
+      (string_content)))
+  (export
+    (string
+      (string_content))
+    (string
+      (string_content)
+      (escape_sequence)
+      (string_content)))
+  (export
+    (string
+      (string_content))
+    (list
+      (string
+        (string_content))
+      (string
+        (string_content)))))
+
+==================
 hcl passthrough, bare and trusted, with nested braces, strings and comments
 ==================
 
