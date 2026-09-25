@@ -100,11 +100,22 @@ export default grammar({
         optional(seq("description", field("description", $.string))),
       ),
 
-    // interface "NAME" { export … } — one team's exports, written to their own module
-    // hcl/interfaces/NAME/ beside the core exports; the body holds exports only
+    // interface "NAME" { export … use interface … } — one team's exports, written to
+    // their own module hcl/interfaces/NAME/ beside the core exports; the body holds
+    // exports and `use interface` lines only
     interface: ($) =>
       seq("interface", field("name", $.string), field("body", $.interface_body)),
-    interface_body: ($) => seq("{", repeat($.export), "}"),
+    interface_body: ($) => seq("{", repeat(choice($.export, $.use_interface)), "}"),
+
+    // use interface "NAME" [when PARAM] / use interface ["A", "B"] [when PARAM] — the
+    // team's module carries the named interfaces' exports too; a name, never a path
+    use_interface: ($) =>
+      seq(
+        "use",
+        "interface",
+        field("names", choice($.string, $.list)),
+        optional(seq("when", field("condition", $.identifier))),
+      ),
 
     suppress: ($) =>
       seq(

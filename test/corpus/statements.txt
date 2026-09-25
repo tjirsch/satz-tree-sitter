@@ -422,6 +422,38 @@ interface "team-a" {
             (string_content)))))))
 
 ==================
+interface using others
+==================
+
+interface "team-a" {
+  use interface "network"
+  use interface ["dns", "logs"] when want_logs
+  export "own" = 1
+}
+
+---
+
+(source_file
+  (interface
+    (string
+      (string_content))
+    (interface_body
+      (use_interface
+        (string
+          (string_content)))
+      (use_interface
+        (list
+          (string
+            (string_content))
+          (string
+            (string_content)))
+        (identifier))
+      (export
+        (string
+          (string_content))
+        (number)))))
+
+==================
 hcl passthrough, bare and trusted, with nested braces, strings and comments
 ==================
 
