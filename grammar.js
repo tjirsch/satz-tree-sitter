@@ -34,6 +34,7 @@ export default grammar({
         $.action,
         $.notice,
         $.offers,
+        $.export,
         $.suppress,
         $.hcl_block,
         $.attribute,
@@ -86,6 +87,17 @@ export default grammar({
     // offers "presets/x.satz" { when phase block after_scaffold by_hand requires
     // excludes } — one entry per pack the library offers, read by `satz pack-graph`
     offers: ($) => seq("offers", field("path", $.string), field("body", $.body)),
+
+    // export "NAME" = VALUE [description "…"] — one value the estate publishes to
+    // the HCL beside it, emitted as an output of hcl/interface/
+    export: ($) =>
+      seq(
+        "export",
+        field("name", $.string),
+        "=",
+        field("value", $._value),
+        optional(seq("description", field("description", $.string))),
+      ),
 
     suppress: ($) =>
       seq(
