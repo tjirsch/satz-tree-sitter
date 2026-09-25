@@ -405,6 +405,10 @@
         {
           "type": "export",
           "named": true
+        },
+        {
+          "type": "use_interface",
+          "named": true
         }
       ]
     }
@@ -743,6 +747,36 @@
         "types": [
           {
             "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "use_interface",
+    "named": true,
+    "fields": {
+      "condition": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "names": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "list",
+            "named": true
+          },
+          {
+            "type": "string",
             "named": true
           }
         ]
