@@ -577,3 +577,81 @@ google_thing {
             (identifier)
             (string
               (string_content))))))))
+
+==================
+common interface
+==================
+
+interface "dns" common {
+  export "zone" = "z"
+}
+
+---
+
+(source_file
+  (interface
+    (string
+      (string_content))
+    (interface_body
+      (export
+        (string
+          (string_content))
+        (string
+          (string_content))))))
+
+==================
+interface file
+==================
+
+interface "archive"
+
+central {
+  estate        = "showcase"
+  organizations = ["organizations/123456789012"]
+}
+
+output "folder" {
+  value   = "${{data.google_active_folder.infra.name}}"
+  attach  = ["google_folder_iam_member"]
+  targets = ["google_folder.infra"]
+}
+
+---
+
+(source_file
+  (header
+    (string
+      (string_content)))
+  (block
+    (identifier)
+    (body
+      (attribute
+        (identifier)
+        (string
+          (string_content)))
+      (attribute
+        (identifier)
+        (list
+          (string
+            (string_content))))))
+  (block
+    (identifier)
+    (string
+      (string_content))
+    (body
+      (attribute
+        (identifier)
+        (string
+          (string_content)
+          (escape_sequence)
+          (string_content)))
+      (attribute
+        (identifier)
+        (list
+          (string
+            (string_content))))
+      (attribute
+        (identifier)
+        (list
+          (string
+            (string_content)))))))

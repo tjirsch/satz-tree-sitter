@@ -42,12 +42,17 @@ export default grammar({
         $.block,
       ),
 
-    // estate NAME | pack NAME [version "…"]
+    // estate NAME | pack NAME [version "…"] | interface "NAME" — the last heads an
+    // interface file satz generates for a project: the name alone on its line, then
+    // `central`, `output`, `lookup` and `managed` blocks
     header: ($) =>
-      seq(
-        field("kind", choice("estate", "pack")),
-        field("name", $.identifier),
-        optional(seq("version", field("version", $.string))),
+      choice(
+        seq(
+          field("kind", choice("estate", "pack")),
+          field("name", $.identifier),
+          optional(seq("version", field("version", $.string))),
+        ),
+        seq(field("kind", "interface"), field("name", $.string)),
       ),
 
     params: ($) => seq("params", "{", repeat($.param), "}"),
@@ -90,7 +95,7 @@ export default grammar({
     offers: ($) => seq("offers", field("path", $.string), field("body", $.body)),
 
     // export "NAME" = VALUE [attach ["TYPE", …]] [description "…"] — one value the
-    // estate publishes to the HCL beside it, emitted as an output of hcl/interfaces/;
+    // estate publishes to the projects beside it, carried by its interfaces/;
     // `attach` and `description` follow the value in either order, each once (the
     // parser refuses a repeat)
     export: ($) =>
@@ -110,15 +115,16 @@ export default grammar({
     // all TYPE — every resource of one type, as a map keyed by label
     all_resources: ($) => seq("all", field("type", $.identifier)),
 
-    // interface "NAME" { export … use interface … } — one team's exports, written to
-    // their own module hcl/interfaces/NAME/ beside the core exports; the body holds
-    // exports and `use interface` lines only
+    // interface "NAME" [common] { export … use interface … } — one project's exports,
+    // written to interfaces/NAME/ beside the core exports; `common` puts it into the
+    // library every project's folder carries; the body holds exports and `use
+    // interface` lines only
     interface: ($) =>
-      seq("interface", field("name", $.string), field("body", $.interface_body)),
+      seq("interface", field("name", $.string), optional("common"), field("body", $.interface_body)),
     interface_body: ($) => seq("{", repeat(choice($.export, $.use_interface)), "}"),
 
     // use interface "NAME" [when PARAM] / use interface ["A", "B"] [when PARAM] — the
-    // team's module carries the named interfaces' exports too; a name, never a path
+    // project's interface carries the named interfaces' exports too; a name, never a path
     use_interface: ($) =>
       seq(
         "use",
