@@ -219,3 +219,43 @@ y = 2 # trailing
     (identifier)
     (number))
   (comment))
+
+==================
+each: one body per entry of a list param
+==================
+
+google_compute_subnetwork {
+  each shared_vpc_subnets by name {
+    name          = "{each.name}"
+    ip_cidr_range = each.cidr
+  }
+  hand_written {
+    name = "x"
+  }
+}
+
+---
+
+(source_file
+  (block
+    (identifier)
+    (body
+      (each
+        (identifier)
+        (identifier)
+        (body
+          (attribute
+            (identifier)
+            (string
+              (interpolation
+                (parameter))))
+          (attribute
+            (identifier)
+            (reference))))
+      (block
+        (identifier)
+        (body
+          (attribute
+            (identifier)
+            (string
+              (string_content))))))))

@@ -162,6 +162,10 @@
           "named": true
         },
         {
+          "type": "each",
+          "named": true
+        },
+        {
           "type": "use_statement",
           "named": true
         }
@@ -233,6 +237,42 @@
     "type": "coverage",
     "named": true,
     "fields": {}
+  },
+  {
+    "type": "each",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "body",
+            "named": true
+          }
+        ]
+      },
+      "key": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "list": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    }
   },
   {
     "type": "export",
@@ -552,6 +592,10 @@
         },
         {
           "type": "block",
+          "named": true
+        },
+        {
+          "type": "each",
           "named": true
         },
         {
@@ -928,6 +972,10 @@
     "named": false
   },
   {
+    "type": "by",
+    "named": false
+  },
+  {
     "type": "claim",
     "named": false
   },
@@ -950,6 +998,10 @@
   },
   {
     "type": "deviates",
+    "named": false
+  },
+  {
+    "type": "each",
     "named": false
   },
   {

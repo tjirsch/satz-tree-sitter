@@ -161,7 +161,13 @@ export default grammar({
     hcl_text: (_) => token(prec(-1, choice(/[^{}"#\/\s][^{}"#\/]*/, /\/[^\/*{}"#]/))),
 
     body: ($) => seq("{", repeat($._entry), "}"),
-    _entry: ($) => choice($.attribute, $.block, $.use_statement),
+    _entry: ($) => choice($.attribute, $.block, $.use_statement, $.each),
+
+    // each LIST by FIELD { … } — inside a resource type map: one labelled body per entry
+    // of the list param, labelled by the entry's FIELD; `{each.x}` and `each.x` read the
+    // entry's fields
+    each: ($) =>
+      seq("each", field("list", $.identifier), "by", field("key", $.identifier), field("body", $.body)),
 
     attribute: ($) => seq(field("key", $._key), "=", field("value", $._value)),
     // KEY [NAME] { … } — a resource map, a named map entry, a nested mapping;
@@ -230,7 +236,7 @@ export default grammar({
     interpolation: ($) =>
       seq(
         token.immediate("{"),
-        field("parameter", alias(token.immediate(/[A-Za-z0-9_]+/), $.parameter)),
+        field("parameter", alias(token.immediate(/[A-Za-z0-9_.]+/), $.parameter)),
         token.immediate("}"),
       ),
 
