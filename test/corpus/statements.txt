@@ -655,3 +655,31 @@ output "folder" {
         (list
           (string
             (string_content)))))))
+
+==================
+export of the resources under one folder
+==================
+
+export "team" = all google_project under google_folder.team_a
+
+---
+
+(source_file
+  (export
+    (string
+      (string_content))
+    (all_resources
+      (identifier)
+      (identifier))))
+
+==================
+private statement
+==================
+
+private google_storage_bucket.logs
+
+---
+
+(source_file
+  (private
+    (identifier)))

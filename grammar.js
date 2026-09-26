@@ -37,6 +37,7 @@ export default grammar({
         $.export,
         $.interface,
         $.suppress,
+        $.private,
         $.hcl_block,
         $.attribute,
         $.block,
@@ -112,8 +113,10 @@ export default grammar({
         ),
       ),
 
-    // all TYPE — every resource of one type, as a map keyed by label
-    all_resources: ($) => seq("all", field("type", $.identifier)),
+    // all TYPE [under TYPE.LABEL] — every resource of one type, as a map keyed by label;
+    // `under` keeps the ones placed under that folder or project
+    all_resources: ($) =>
+      seq("all", field("type", $.identifier), optional(seq("under", field("under", $.identifier)))),
 
     // interface "NAME" [common] { export … use interface … } — one project's exports,
     // written to interfaces/NAME/ beside the core exports; `common` puts it into the
@@ -132,6 +135,10 @@ export default grammar({
         field("names", choice($.string, $.list)),
         optional(seq("when", field("condition", $.identifier))),
       ),
+
+    // private TYPE.LABEL — keeps that resource out of every export, a pack's too; the
+    // estate's own file only
+    private: ($) => seq("private", field("resource", $.identifier)),
 
     suppress: ($) =>
       seq(
