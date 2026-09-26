@@ -683,3 +683,32 @@ private google_storage_bucket.logs
 (source_file
   (private
     (identifier)))
+
+==================
+request point on a list param
+==================
+
+request shared_vpc_subnets {
+  key    = "name"
+  fields = ["name", "cidr", "region"]
+}
+
+---
+
+(source_file
+  (request
+    (identifier)
+    (body
+      (attribute
+        (identifier)
+        (string
+          (string_content)))
+      (attribute
+        (identifier)
+        (list
+          (string
+            (string_content))
+          (string
+            (string_content))
+          (string
+            (string_content)))))))

@@ -735,6 +735,32 @@
     }
   },
   {
+    "type": "request",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "body",
+            "named": true
+          }
+        ]
+      },
+      "param": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "source_file",
     "named": true,
     "root": true,
@@ -793,6 +819,10 @@
         },
         {
           "type": "question",
+          "named": true
+        },
+        {
+          "type": "request",
           "named": true
         },
         {
@@ -1083,6 +1113,10 @@
   {
     "type": "reference",
     "named": true
+  },
+  {
+    "type": "request",
+    "named": false
   },
   {
     "type": "role",

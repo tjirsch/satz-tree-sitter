@@ -38,6 +38,7 @@ export default grammar({
         $.interface,
         $.suppress,
         $.private,
+        $.request,
         $.hcl_block,
         $.attribute,
         $.block,
@@ -139,6 +140,10 @@ export default grammar({
     // private TYPE.LABEL — keeps that resource out of every export, a pack's too; the
     // estate's own file only
     private: ($) => seq("private", field("resource", $.identifier)),
+
+    // request LIST { key = "…" fields = [ … ] description = "…" } — what a team may add to a
+    // list param through a contribution, and the shape of each entry
+    request: ($) => seq("request", field("param", $.identifier), field("body", $.body)),
 
     suppress: ($) =>
       seq(

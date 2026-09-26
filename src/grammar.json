@@ -63,6 +63,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "request"
+        },
+        {
+          "type": "SYMBOL",
           "name": "hcl_block"
         },
         {
@@ -698,6 +702,31 @@
           "content": {
             "type": "SYMBOL",
             "name": "identifier"
+          }
+        }
+      ]
+    },
+    "request": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "request"
+        },
+        {
+          "type": "FIELD",
+          "name": "param",
+          "content": {
+            "type": "SYMBOL",
+            "name": "identifier"
+          }
+        },
+        {
+          "type": "FIELD",
+          "name": "body",
+          "content": {
+            "type": "SYMBOL",
+            "name": "body"
           }
         }
       ]
