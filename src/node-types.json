@@ -398,6 +398,10 @@
           "named": true
         },
         {
+          "type": "hcl_heredoc",
+          "named": true
+        },
+        {
           "type": "hcl_string",
           "named": true
         },
@@ -1053,6 +1057,10 @@
   {
     "type": "hcl",
     "named": false
+  },
+  {
+    "type": "hcl_heredoc",
+    "named": true
   },
   {
     "type": "hcl_string",

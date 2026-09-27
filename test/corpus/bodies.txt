@@ -259,3 +259,42 @@ google_compute_subnetwork {
             (identifier)
             (string
               (string_content))))))))
+
+==================
+each is a label unless LIST by FIELD follows
+==================
+
+google_folder {
+  each {
+    display_name = "each"
+  }
+  each x {
+    display_name = "x"
+  }
+  each = 1
+}
+
+---
+
+(source_file
+  (block
+    (identifier)
+    (body
+      (block
+        (identifier)
+        (body
+          (attribute
+            (identifier)
+            (string
+              (string_content)))))
+      (block
+        (identifier)
+        (identifier)
+        (body
+          (attribute
+            (identifier)
+            (string
+              (string_content)))))
+      (attribute
+        (identifier)
+        (number)))))

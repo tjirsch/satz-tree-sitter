@@ -17,6 +17,9 @@ folder and repository `satz-tree-sitter`.
 - **Example values only.** This repository has no privacy gate; nothing shaped like
   a customer id, domain, project or name goes into `test/corpus/`. Use the values
   of satz's `docs/examples.md`.
-- **No external scanner until a real file needs one.** `hcl_body` is a nested rule;
-  heredocs with unbalanced braces are the known gap.
+- **No external scanner until a real file needs one.** `hcl_body` is a nested rule and
+  `hcl_heredoc` a regex token that ends at the first line that is one bare word, not at
+  the line that repeats the tag — the known gap, closed exactly only by a scanner.
+- **A line break is whitespace here.** The parser reads `all TYPE`, `under …` and
+  `private TYPE.LABEL` only on one line; the grammar reads them across a break too.
 - **Planning lives in the vault**, not here: `satz-private/ROADMAP.satz-tree-sitter.md`.
