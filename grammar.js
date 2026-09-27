@@ -5,8 +5,8 @@
  *
  * Mirrors the hand-written lexer and parser in satz (crates/satz-core/src/satz.rs):
  * ten token kinds, no operators, every keyword contextual. The `hcl { … }` body is
- * raw HCL kept brace-balanced here the way satz's scan_hcl_body keeps it — strings
- * and comments are stepped over; heredocs are not (none exist in the corpus).
+ * raw HCL kept brace-balanced here the way satz's scan_hcl_body keeps it — strings,
+ * comments and heredocs are stepped over.
  */
 
 /// <reference types="tree-sitter-cli/dsl" />
@@ -19,7 +19,25 @@ export default grammar({
 
   // Every keyword is an identifier that the lexer promotes only where the
   // keyword is valid — `action { type = "Delete" }` inside a body stays a key.
+  //
+  // Three keywords are valid exactly where a key or a value is valid too, and the
+  // parser reads them as a keyword only when the statement's shape follows:
+  // `each` opens an entry only as `each LIST by FIELD {`, `private` is a
+  // statement only as `private TYPE.LABEL`, `all` is an export's value only as
+  // `all TYPE`. Anything else — `each { … }`, `each x { … }`, `private = true`,
+  // `private { … }`, `export "a" = all` — is a key or a param named that way. So
+  // `_key` and the export value take the promoted token back as an identifier,
+  // and the conflicts below let both readings run until the next token decides.
+  // The parser also asks that the type stand on the line of `all` and the address
+  // on the line of `private`; a line break is whitespace here, so those two
+  // readings are the same on either side of one.
   word: ($) => $.identifier,
+
+  conflicts: ($) => [
+    [$.each, $._key],
+    [$.private, $._key],
+    [$.all_resources, $.export],
+  ],
 
   rules: {
     source_file: ($) => repeat($._item),
@@ -88,24 +106,25 @@ export default grammar({
 
     action: ($) => seq("action", field("name", $.string), field("body", $.body)),
 
-    // notice PARAM { text run before } — what to run once the pack is switched on,
-    // acknowledged when the estate binds PARAM = true
+    // notice PARAM { text run severity } — the command a pack asks for once it is
+    // switched on; `text` and `run` are literal strings, `severity` is one of the
+    // bare words error, warning, info; the estate acknowledges by binding PARAM = true
     notice: ($) => seq("notice", field("name", $.identifier), field("body", $.body)),
 
-    // offers "presets/x.satz" { when phase block after_scaffold by_hand requires
-    // excludes } — one entry per pack the library offers, read by `satz pack-graph`
+    // offers "presets/x.satz" { when phase block by_hand requires excludes } — one
+    // entry per pack the library offers, read by `satz pack-graph`
     offers: ($) => seq("offers", field("path", $.string), field("body", $.body)),
 
     // export "NAME" = VALUE [attach ["TYPE", …]] [description "…"] — one value the
     // estate publishes to the projects beside it, carried by its interfaces/;
     // `attach` and `description` follow the value in either order, each once (the
-    // parser refuses a repeat)
+    // parser refuses a repeat). `all` with no type after it is a param named `all`.
     export: ($) =>
       seq(
         "export",
         field("name", $.string),
         "=",
-        field("value", choice($.all_resources, $._value)),
+        field("value", choice($.all_resources, $._value, alias("all", $.reference))),
         repeat(
           choice(
             seq("attach", field("attach", $.list)),
@@ -115,9 +134,14 @@ export default grammar({
       ),
 
     // all TYPE [under TYPE.LABEL] — every resource of one type, as a map keyed by label;
-    // `under` keeps the ones placed under that folder or project
+    // `under` keeps the ones placed under that folder or project. The dynamic
+    // precedence decides `all google_folder` followed by a two-label block: the word
+    // after `all` is the type, not the export's end and the block's key.
     all_resources: ($) =>
-      seq("all", field("type", $.identifier), optional(seq("under", field("under", $.identifier)))),
+      prec.dynamic(
+        1,
+        seq("all", field("type", $.identifier), optional(seq("under", field("under", $.identifier)))),
+      ),
 
     // interface "NAME" [common] { export … use interface … } — one project's exports,
     // written to interfaces/NAME/ beside the core exports; `common` puts it into the
@@ -159,11 +183,33 @@ export default grammar({
     // hcl_content is one node over everything between the braces, so an editor
     // can hand exactly that text to an HCL grammar.
     hcl_body: ($) => seq("{", optional($.hcl_content), "}"),
-    hcl_content: ($) => repeat1(choice($.hcl_body, $.hcl_string, $.hcl_text)),
+    hcl_content: ($) => repeat1(choice($.hcl_body, $.hcl_string, $.hcl_heredoc, $.hcl_text)),
     hcl_string: (_) => token(seq('"', repeat(choice(/[^"\\\n]/, /\\./)), '"')),
-    // Any run that opens neither a brace, a string nor a comment; a lone `/`
-    // that is not `//` or `/*` is text too.
-    hcl_text: (_) => token(prec(-1, choice(/[^{}"#\/\s][^{}"#\/]*/, /\/[^\/*{}"#]/))),
+    // <<TAG or <<-TAG, the rest of its line, then every line up to and including the
+    // first that is one bare word — satz ends the heredoc at the line that is the
+    // tag; a regex cannot compare the two, so a body line that is one bare word
+    // ends it here. Braces inside count for nothing. A line goes on when it is
+    // blank, starts with something other than a word, or holds more after its
+    // first word: another character right behind it, or whitespace and then one.
+    hcl_heredoc: (_) =>
+      token(
+        seq(
+          "<<",
+          optional("-"),
+          /[A-Za-z0-9_]+[^\n]*\n/,
+          repeat(
+            seq(
+              /[ \t\r]*([^A-Za-z0-9_ \t\r\n][^\n]*|[A-Za-z0-9_]+([^A-Za-z0-9_ \t\r\n]|[ \t\r]+[^ \t\r\n])[^\n]*)?/,
+              "\n",
+            ),
+          ),
+          /[ \t\r]*[A-Za-z0-9_]+[ \t\r]*\n/,
+        ),
+      ),
+    // Any run that opens neither a brace, a string, a comment nor a heredoc; a lone
+    // `/` that is not `//` or `/*`, and a lone `<` that is not `<<`, are text too.
+    hcl_text: (_) =>
+      token(prec(-1, choice(/[^{}"#\/\s<][^{}"#\/<]*/, /\/[^\/*{}"#<]?/, /<[^<{}"#\/]?/))),
 
     body: ($) => seq("{", repeat($._entry), "}"),
     _entry: ($) => choice($.attribute, $.block, $.use_statement, $.each),
@@ -179,7 +225,9 @@ export default grammar({
     // the provider schema, not the syntax, decides which.
     block: ($) =>
       seq(field("key", $._key), optional(field("name", $._key)), field("body", $.body)),
-    _key: ($) => choice($.identifier, $.string),
+    // A key is a word or a string; `each` and `private` are words too where their
+    // statement's shape does not follow (see `word` above).
+    _key: ($) => choice($.identifier, $.string, alias("each", $.identifier), alias("private", $.identifier)),
 
     _value: ($) =>
       choice(
@@ -203,35 +251,41 @@ export default grammar({
 
     string: ($) => choice($._single_string, $._triple_string),
 
-    // "…" — escapes \n \" \\ only; {{ is a literal brace; a lone } is literal;
-    // {name} interpolates a param.
+    // "…" — escapes \n \" \\ only; {{ is a literal `{` and }} a literal `}`; a lone
+    // } is literal; {name} interpolates a param.
+    // Content stops at every `{` so that a comment-shaped string (`"//…{p}"`) can
+    // never be lexed as a comment, and before a `}` that another `}` follows so
+    // that `}}` is the escape: a `}` joins the run only with the character after
+    // it, and stands alone before a quote, a brace or a backslash.
     _single_string: ($) =>
       seq(
         '"',
         repeat(
           choice(
-            alias(token.immediate(prec(1, /[^"\\{\n]+/)), $.string_content),
+            alias(token.immediate(prec(1, /([^"\\{}\n]|\}[^"\\{}\n])+|\}/)), $.string_content),
             $.escape_sequence,
             $.interpolation,
           ),
         ),
         token.immediate('"'),
       ),
-    // `{{` is the escape for a literal brace; content stops at every `{` so
-    // that a comment-shaped string (`"//…{p}"`) can never be lexed as a comment.
-    escape_sequence: (_) => token.immediate(prec(1, choice(/\\[n"\\]/, "{{"))),
+    escape_sequence: (_) => token.immediate(prec(1, choice(/\\[n"\\]/, "{{", "}}"))),
 
-    // """…""" — no escapes (a backslash is literal), same {{ and {name} rules.
+    // """…""" — no escapes (a backslash is literal), same {{ }} and {name} rules. A
+    // `"` that is not part of the closing `"""` is content: it joins the run with
+    // the character after it, and a lone one before a brace is a token of its own
+    // at precedence 0, so it can never cut the closing `"""` short.
     _triple_string: ($) =>
       seq(
         '"""',
         repeat(
           choice(
             alias(
-              token.immediate(prec(1, /([^"{]|"[^"{]|""[^"{])+/)),
+              token.immediate(prec(1, /([^"{}]|"[^"{}]|""[^"{}]|\}[^"{}])+|\}/)),
               $.string_content,
             ),
-            alias(token.immediate(prec(1, "{{")), $.escape_sequence),
+            alias(token.immediate('"'), $.string_content),
+            alias(token.immediate(prec(1, choice("{{", "}}"))), $.escape_sequence),
             $.interpolation,
           ),
         ),

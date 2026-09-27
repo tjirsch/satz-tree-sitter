@@ -300,9 +300,9 @@ notice
 ==================
 
 notice cis_baseline_adopted {
-  text   = "Run satz adopt once, so the policies Google set already are imported."
-  run    = "satz adopt {customer_shortname}.satz --execute --import"
-  before = apply
+  text     = "Run satz adopt once, so the policies Google set already are imported."
+  run      = "satz adopt <estate> --execute --import"
+  severity = error
 }
 
 ---
@@ -318,9 +318,6 @@ notice cis_baseline_adopted {
       (attribute
         (identifier)
         (string
-          (string_content)
-          (interpolation
-            (parameter))
           (string_content)))
       (attribute
         (identifier)
@@ -379,7 +376,8 @@ export "regions" = ["europe-west3", "europe-west4"]
     (string
       (string_content)
       (escape_sequence)
-      (string_content)))
+      (string_content)
+      (escape_sequence)))
   (export
     (string
       (string_content))
@@ -411,7 +409,8 @@ interface "team-a" {
         (string
           (string_content)
           (escape_sequence)
-          (string_content))
+          (string_content)
+          (escape_sequence))
         (string
           (string_content)))
       (export
@@ -644,7 +643,8 @@ output "folder" {
         (string
           (string_content)
           (escape_sequence)
-          (string_content)))
+          (string_content)
+          (escape_sequence)))
       (attribute
         (identifier)
         (list
@@ -712,3 +712,117 @@ request shared_vpc_subnets {
             (string_content))
           (string
             (string_content)))))))
+
+==================
+all with no type after it is a param named all
+==================
+
+export "a" = all
+export "b" = all description "d"
+export "c" = all attach ["google_folder_iam_member"]
+
+---
+
+(source_file
+  (export
+    (string
+      (string_content))
+    (reference))
+  (export
+    (string
+      (string_content))
+    (reference)
+    (string
+      (string_content)))
+  (export
+    (string
+      (string_content))
+    (reference)
+    (list
+      (string
+        (string_content)))))
+
+==================
+private is a key unless a resource address follows
+==================
+
+private google_storage_bucket.logs
+private {
+  x = 1
+}
+private = true
+google_storage_bucket {
+  logs {
+    private = true
+  }
+  "private" {
+    name = "p"
+  }
+}
+
+---
+
+(source_file
+  (private
+    (identifier))
+  (block
+    (identifier)
+    (body
+      (attribute
+        (identifier)
+        (number))))
+  (attribute
+    (identifier)
+    (boolean))
+  (block
+    (identifier)
+    (body
+      (block
+        (identifier)
+        (body
+          (attribute
+            (identifier)
+            (boolean))))
+      (block
+        (string
+          (string_content))
+        (body
+          (attribute
+            (identifier)
+            (string
+              (string_content))))))))
+
+==================
+hcl passthrough with heredocs holding unbalanced braces
+==================
+
+hcl {
+  resource "google_storage_bucket_object" "policy" {
+    content = <<-EOT
+      { "unbalanced": "{" }
+      {
+    EOT
+    name = "policy.json"
+  }
+  y = <<JSON
+{"a": {
+JSON
+}
+
+---
+
+(source_file
+  (hcl_block
+    (hcl_body
+      (hcl_content
+        (hcl_text)
+        (hcl_string)
+        (hcl_string)
+        (hcl_body
+          (hcl_content
+            (hcl_text)
+            (hcl_heredoc)
+            (hcl_text)
+            (hcl_string)))
+        (hcl_text)
+        (hcl_heredoc)))))

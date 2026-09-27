@@ -27,7 +27,8 @@ e = "line\nbreak\\slash"
     (string
       (string_content)
       (escape_sequence)
-      (string_content)))
+      (string_content)
+      (escape_sequence)))
   (attribute
     (identifier)
     (string
@@ -41,7 +42,8 @@ e = "line\nbreak\\slash"
       (interpolation
         (parameter))
       (escape_sequence)
-      (string_content)))
+      (string_content)
+      (escape_sequence)))
   (attribute
     (identifier)
     (string
@@ -121,4 +123,59 @@ b = " "
   (attribute
     (identifier)
     (string
+      (string_content))))
+
+==================
+A closing brace: }} is the escape, a lone } is content
+==================
+
+a = "a}b"
+b = "a}"
+c = "}}"
+d = "a}}}b"
+e = "}{p}"
+f = """
+  {p} }} "" "x" "{q}
+"""
+
+---
+
+(source_file
+  (attribute
+    (identifier)
+    (string
+      (string_content)))
+  (attribute
+    (identifier)
+    (string
+      (string_content)
+      (string_content)))
+  (attribute
+    (identifier)
+    (string
+      (escape_sequence)))
+  (attribute
+    (identifier)
+    (string
+      (string_content)
+      (escape_sequence)
+      (string_content)))
+  (attribute
+    (identifier)
+    (string
+      (string_content)
+      (interpolation
+        (parameter))))
+  (attribute
+    (identifier)
+    (string
+      (string_content)
+      (interpolation
+        (parameter))
+      (string_content)
+      (escape_sequence)
+      (string_content)
+      (string_content)
+      (interpolation
+        (parameter))
       (string_content))))

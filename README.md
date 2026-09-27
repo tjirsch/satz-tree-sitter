@@ -6,10 +6,11 @@ A [tree-sitter](https://tree-sitter.github.io) grammar for **Satz**, the languag
 
 The grammar mirrors satz's own front-end (`crates/satz-core/src/satz.rs`): the same
 ten token kinds, the same contextual keywords, the same string rules (`\n \" \\`
-escapes in a single-line string, none in a `"""` string, `{{` for a literal brace,
-`{name}` for a parameter). The `hcl { … }` passthrough is kept brace-balanced the
-way satz keeps it — strings and comments are stepped over; a heredoc with unbalanced
-braces inside an `hcl` body is not handled.
+escapes in a single-line string, none in a `"""` string, `{{` and `}}` for a literal
+brace, `{name}` for a parameter). The `hcl { … }` passthrough is kept brace-balanced the
+way satz keeps it — strings, comments and heredocs are stepped over. One difference:
+satz ends a heredoc at the line that repeats its tag, and a regex cannot compare the
+two, so the grammar ends it at the first line that is one bare word.
 
 ## Use
 
