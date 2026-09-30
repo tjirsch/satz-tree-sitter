@@ -47,6 +47,8 @@ e = "line\nbreak\\slash"
   (attribute
     (identifier)
     (string
+      (string_content)
+      (string_content)
       (string_content)))
   (attribute
     (identifier)
@@ -64,6 +66,9 @@ A string that starts like a comment is a string
 a = "//cloudresourcemanager.googleapis.com/organizations/{customer_organization_id}"
 b = "#not-a-comment"
 c = "{p}//not-a-comment"
+d = "//x}}"
+e = "#x}"
+f = """//x}} // "y" #}"""
 
 ---
 
@@ -83,6 +88,27 @@ c = "{p}//not-a-comment"
     (string
       (interpolation
         (parameter))
+      (string_content)))
+  (attribute
+    (identifier)
+    (string
+      (string_content)
+      (escape_sequence)))
+  (attribute
+    (identifier)
+    (string
+      (string_content)
+      (string_content)))
+  (attribute
+    (identifier)
+    (string
+      (string_content)
+      (escape_sequence)
+      (string_content)
+      (string_content)
+      (string_content)
+      (string_content)
+      (string_content)
       (string_content))))
 
 ==================
@@ -144,6 +170,8 @@ f = """
   (attribute
     (identifier)
     (string
+      (string_content)
+      (string_content)
       (string_content)))
   (attribute
     (identifier)
@@ -159,6 +187,7 @@ f = """
     (string
       (string_content)
       (escape_sequence)
+      (string_content)
       (string_content)))
   (attribute
     (identifier)
@@ -174,6 +203,13 @@ f = """
         (parameter))
       (string_content)
       (escape_sequence)
+      (string_content)
+      (string_content)
+      (string_content)
+      (string_content)
+      (string_content)
+      (string_content)
+      (string_content)
       (string_content)
       (string_content)
       (interpolation

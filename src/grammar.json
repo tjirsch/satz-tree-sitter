@@ -1291,7 +1291,23 @@
                     "value": 1,
                     "content": {
                       "type": "PATTERN",
-                      "value": "([^\"\\\\{}\\n]|\\}[^\"\\\\{}\\n])+|\\}"
+                      "value": "[^\"\\\\{}\\n]+"
+                    }
+                  }
+                },
+                "named": true,
+                "value": "string_content"
+              },
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "IMMEDIATE_TOKEN",
+                  "content": {
+                    "type": "PREC",
+                    "value": 1,
+                    "content": {
+                      "type": "STRING",
+                      "value": "}"
                     }
                   }
                 },
@@ -1363,7 +1379,23 @@
                     "value": 1,
                     "content": {
                       "type": "PATTERN",
-                      "value": "([^\"{}]|\"[^\"{}]|\"\"[^\"{}]|\\}[^\"{}])+|\\}"
+                      "value": "[^\"{}]+"
+                    }
+                  }
+                },
+                "named": true,
+                "value": "string_content"
+              },
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "IMMEDIATE_TOKEN",
+                  "content": {
+                    "type": "PREC",
+                    "value": 1,
+                    "content": {
+                      "type": "STRING",
+                      "value": "}"
                     }
                   }
                 },

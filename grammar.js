@@ -253,16 +253,17 @@ export default grammar({
 
     // "…" — escapes \n \" \\ only; {{ is a literal `{` and }} a literal `}`; a lone
     // } is literal; {name} interpolates a param.
-    // Content stops at every `{` so that a comment-shaped string (`"//…{p}"`) can
-    // never be lexed as a comment, and before a `}` that another `}` follows so
-    // that `}}` is the escape: a `}` joins the run only with the character after
-    // it, and stands alone before a quote, a brace or a backslash.
+    // A content run stops at every brace, and a lone `}` is a token of its own that
+    // `}}` outruns by length. A run that could continue through a `}` lets a
+    // comment-shaped run (`"//x}"`, `"#}}"`) lose to the comment token once the
+    // brace ends it; a run that stops at every brace never gets that far.
     _single_string: ($) =>
       seq(
         '"',
         repeat(
           choice(
-            alias(token.immediate(prec(1, /([^"\\{}\n]|\}[^"\\{}\n])+|\}/)), $.string_content),
+            alias(token.immediate(prec(1, /[^"\\{}\n]+/)), $.string_content),
+            alias(token.immediate(prec(1, "}")), $.string_content),
             $.escape_sequence,
             $.interpolation,
           ),
@@ -272,18 +273,17 @@ export default grammar({
     escape_sequence: (_) => token.immediate(prec(1, choice(/\\[n"\\]/, "{{", "}}"))),
 
     // """…""" — no escapes (a backslash is literal), same {{ }} and {name} rules. A
-    // `"` that is not part of the closing `"""` is content: it joins the run with
-    // the character after it, and a lone one before a brace is a token of its own
-    // at precedence 0, so it can never cut the closing `"""` short.
+    // content run stops at every quote and every brace, for the reason the single
+    // string's does. A `"` that is not part of the closing `"""` is a token of its
+    // own at precedence 0, so the closing `"""` outruns it; a lone `}` is one at
+    // precedence 1, which `}}` outruns by length.
     _triple_string: ($) =>
       seq(
         '"""',
         repeat(
           choice(
-            alias(
-              token.immediate(prec(1, /([^"{}]|"[^"{}]|""[^"{}]|\}[^"{}])+|\}/)),
-              $.string_content,
-            ),
+            alias(token.immediate(prec(1, /[^"{}]+/)), $.string_content),
+            alias(token.immediate(prec(1, "}")), $.string_content),
             alias(token.immediate('"'), $.string_content),
             alias(token.immediate(prec(1, choice("{{", "}}"))), $.escape_sequence),
             $.interpolation,
