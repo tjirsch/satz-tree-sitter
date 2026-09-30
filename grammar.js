@@ -22,7 +22,8 @@ export default grammar({
   //
   // Three keywords are valid exactly where a key or a value is valid too, and the
   // parser reads them as a keyword only when the statement's shape follows:
-  // `each` opens an entry only as `each LIST by FIELD {`, `private` is a
+  // `each` opens an entry — or, at the top level, interfaces — only as
+  // `each LIST by FIELD {`, `private` is a
   // statement only as `private TYPE.LABEL`, `all` is an export's value only as
   // `all TYPE`. Anything else — `each { … }`, `each x { … }`, `private = true`,
   // `private { … }`, `export "a" = all` — is a key or a param named that way. So
@@ -35,6 +36,7 @@ export default grammar({
 
   conflicts: ($) => [
     [$.each, $._key],
+    [$.each_interface, $._key],
     [$.private, $._key],
     [$.all_resources, $.export],
   ],
@@ -54,6 +56,7 @@ export default grammar({
         $.offers,
         $.export,
         $.interface,
+        $.each_interface,
         $.suppress,
         $.private,
         $.request,
@@ -150,6 +153,20 @@ export default grammar({
     interface: ($) =>
       seq("interface", field("name", $.string), optional("common"), field("body", $.interface_body)),
     interface_body: ($) => seq("{", repeat(choice($.export, $.use_interface)), "}"),
+
+    // each LIST by FIELD { interface "{each.FIELD}" { … } … } — at the top level of a file:
+    // each interface block written once per entry of the list param, its name and export
+    // values read from the entry; a resource's `each` stands inside its type map
+    each_interface: ($) =>
+      seq(
+        "each",
+        field("list", $.identifier),
+        "by",
+        field("key", $.identifier),
+        "{",
+        repeat1($.interface),
+        "}",
+      ),
 
     // use interface "NAME" [when PARAM] / use interface ["A", "B"] [when PARAM] — the
     // project's interface carries the named interfaces' exports too; a name, never a path
