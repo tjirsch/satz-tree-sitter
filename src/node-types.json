@@ -275,6 +275,42 @@
     }
   },
   {
+    "type": "each_interface",
+    "named": true,
+    "fields": {
+      "key": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "list": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "interface",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "export",
     "named": true,
     "fields": {
@@ -787,6 +823,10 @@
         },
         {
           "type": "claim",
+          "named": true
+        },
+        {
+          "type": "each_interface",
           "named": true
         },
         {

@@ -421,6 +421,39 @@ interface "team-a" {
             (string_content)))))))
 
 ==================
+each around interface: one interface per entry of a list
+==================
+
+each projects by name {
+  interface "{each.name}" {
+    export "project_id" = "${{google_project.{each.name}.project_id}}"
+  }
+}
+
+---
+
+(source_file
+  (each_interface
+    (identifier)
+    (identifier)
+    (interface
+      (string
+        (interpolation
+          (parameter)))
+      (interface_body
+        (export
+          (string
+            (string_content))
+          (string
+            (string_content)
+            (escape_sequence)
+            (string_content)
+            (interpolation
+              (parameter))
+            (string_content)
+            (escape_sequence)))))))
+
+==================
 export of every resource of a type
 ==================
 
