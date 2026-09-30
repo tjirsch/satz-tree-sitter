@@ -55,6 +55,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "each_interface"
+        },
+        {
+          "type": "SYMBOL",
           "name": "suppress"
         },
         {
@@ -639,6 +643,50 @@
                 "name": "use_interface"
               }
             ]
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "}"
+        }
+      ]
+    },
+    "each_interface": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "each"
+        },
+        {
+          "type": "FIELD",
+          "name": "list",
+          "content": {
+            "type": "SYMBOL",
+            "name": "identifier"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "by"
+        },
+        {
+          "type": "FIELD",
+          "name": "key",
+          "content": {
+            "type": "SYMBOL",
+            "name": "identifier"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "{"
+        },
+        {
+          "type": "REPEAT1",
+          "content": {
+            "type": "SYMBOL",
+            "name": "interface"
           }
         },
         {
@@ -1523,6 +1571,10 @@
   "conflicts": [
     [
       "each",
+      "_key"
+    ],
+    [
+      "each_interface",
       "_key"
     ],
     [
