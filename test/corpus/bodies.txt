@@ -261,6 +261,46 @@ google_compute_subnetwork {
               (string_content))))))))
 
 ==================
+each … when FIELD: only the entries that carry the field
+==================
+
+google_billing_budget {
+  each budgets by name when amount {
+    display_name = "{each.name}"
+  }
+  each budgets by name when not email {
+    display_name = "{each.name}"
+  }
+}
+
+---
+
+(source_file
+  (block
+    (identifier)
+    (body
+      (each
+        (identifier)
+        (identifier)
+        (identifier)
+        (body
+          (attribute
+            (identifier)
+            (string
+              (interpolation
+                (parameter))))))
+      (each
+        (identifier)
+        (identifier)
+        (identifier)
+        (body
+          (attribute
+            (identifier)
+            (string
+              (interpolation
+                (parameter)))))))))
+
+==================
 each is a label unless LIST by FIELD follows
 ==================
 

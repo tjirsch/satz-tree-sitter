@@ -231,11 +231,19 @@ export default grammar({
     body: ($) => seq("{", repeat($._entry), "}"),
     _entry: ($) => choice($.attribute, $.block, $.use_statement, $.each),
 
-    // each LIST by FIELD { … } — inside a resource type map: one labelled body per entry
-    // of the list param, labelled by the entry's FIELD; `{each.x}` and `each.x` read the
-    // entry's fields
+    // each LIST by FIELD [when [not] FIELD] { … } — inside a resource type map: one labelled
+    // body per entry of the list param, labelled by the entry's FIELD; `{each.x}` and
+    // `each.x` read the entry's fields; with `when`, only the entries that carry that field,
+    // with `when not` only the others
     each: ($) =>
-      seq("each", field("list", $.identifier), "by", field("key", $.identifier), field("body", $.body)),
+      seq(
+        "each",
+        field("list", $.identifier),
+        "by",
+        field("key", $.identifier),
+        optional(seq("when", optional(field("negation", "not")), field("condition", $.identifier))),
+        field("body", $.body),
+      ),
 
     attribute: ($) => seq(field("key", $._key), "=", field("value", $._value)),
     // KEY [NAME] { … } — a resource map, a named map entry, a nested mapping;
