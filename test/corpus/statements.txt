@@ -859,3 +859,41 @@ JSON
             (hcl_string)))
         (hcl_text)
         (hcl_heredoc)))))
+
+==================
+Inputs: a template's contract, the shape of params
+==================
+
+estate project_template
+
+inputs {
+  // the four-digit cost centre the project is billed to
+  cost_centre  = "4711"
+  stage        = "dev"
+  retention    = 400
+  regions      = ["europe-west3"]
+}
+
+---
+
+(source_file
+  (header
+    (identifier))
+  (inputs
+    (comment)
+    (param
+      (identifier)
+      (string
+        (string_content)))
+    (param
+      (identifier)
+      (string
+        (string_content)))
+    (param
+      (identifier)
+      (number))
+    (param
+      (identifier)
+      (list
+        (string
+          (string_content))))))
