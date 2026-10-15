@@ -48,6 +48,7 @@ export default grammar({
       choice(
         $.header,
         $.params,
+        $.inputs,
         $.use_statement,
         $.claim,
         $.question,
@@ -79,6 +80,9 @@ export default grammar({
       ),
 
     params: ($) => seq("params", "{", repeat($.param), "}"),
+    // `inputs { … }`: a template's contract — the same shape as params, bound by the
+    // using document or on the command line, emitted as variables
+    inputs: ($) => seq("inputs", "{", repeat($.param), "}"),
     param: ($) => seq(field("name", $.identifier), "=", field("value", $._value)),
 
     use_statement: ($) =>
