@@ -38,6 +38,7 @@ export default grammar({
     [$.each, $._key],
     [$.each_interface, $._key],
     [$.private, $._key],
+    [$.attribute],
     [$.all_resources, $.export],
   ],
 
@@ -85,14 +86,17 @@ export default grammar({
     inputs: ($) => seq("inputs", "{", repeat($.param), "}"),
     param: ($) => seq(field("name", $.identifier), "=", field("value", $._value)),
 
+    // `when` after the path is the statement's gate, never the key of a next entry
     use_statement: ($) =>
-      seq(
-        "use",
-        field("path", $.string),
-        repeat(
-          choice(
-            seq("as", field("type", $.identifier)),
-            seq("when", field("condition", $.identifier)),
+      prec.right(
+        seq(
+          "use",
+          field("path", $.string),
+          repeat(
+            choice(
+              seq("as", field("type", $.identifier)),
+              seq("when", field("condition", $.identifier)),
+            ),
           ),
         ),
       ),
@@ -235,28 +239,50 @@ export default grammar({
     body: ($) => seq("{", repeat($._entry), "}"),
     _entry: ($) => choice($.attribute, $.block, $.use_statement, $.each),
 
-    // each LIST by FIELD [when [not] FIELD] { … } — inside a resource type map: one labelled
-    // body per entry of the list param, labelled by the entry's FIELD; `{each.x}` and
-    // `each.x` read the entry's fields; with `when`, only the entries that carry that field,
-    // with `when not` only the others
+    // each LIST by FIELD [as "LABEL"] [when [not] FIELD] { … } — inside a resource type map:
+    // one labelled body per entry of the list param, labelled by the entry's FIELD, or by
+    // the string after `as`, which reads the entry; `{each.x}` and `each.x` read the entry's
+    // fields; with `when`, only the entries that carry that field, with `when not` only the
+    // others
     each: ($) =>
       seq(
         "each",
         field("list", $.identifier),
         "by",
         field("key", $.identifier),
+        optional(seq("as", field("label", $.string))),
         optional(seq("when", optional(field("negation", "not")), field("condition", $.identifier))),
         field("body", $.body),
       ),
 
-    attribute: ($) => seq(field("key", $._key), "=", field("value", $._value)),
-    // KEY [NAME] { … } — a resource map, a named map entry, a nested mapping;
-    // the provider schema, not the syntax, decides which.
+    // KEY = VALUE [when [not] NAME] — the attribute, and where a condition follows it only
+    // where NAME carries a value. The parser reads `when NAME` after a value as a condition
+    // unless `{` or `=` follows NAME, where it is the next entry; the precedence says the
+    // same.
+    attribute: ($) =>
+      seq(field("key", $._key), "=", field("value", $._value), optional(field("when", $.condition))),
+    // KEY [NAME] [when [not] NAME] { … } — a resource map, a named map entry, a nested
+    // mapping; the provider schema, not the syntax, decides which.
     block: ($) =>
-      seq(field("key", $._key), optional(field("name", $._key)), field("body", $.body)),
-    // A key is a word or a string; `each` and `private` are words too where their
-    // statement's shape does not follow (see `word` above).
-    _key: ($) => choice($.identifier, $.string, alias("each", $.identifier), alias("private", $.identifier)),
+      seq(
+        field("key", $._key),
+        optional(field("name", $._key)),
+        optional(field("when", $.condition)),
+        field("body", $.body),
+      ),
+    // when [not] NAME — NAME is a param, or inside an `each` a field of the entry, `each.x`
+    condition: ($) => seq("when", optional(field("negation", "not")), field("name", $.identifier)),
+    // A key is a word or a string; `each`, `private` and `when` are words too where their
+    // statement's shape does not follow (see `word` above): `when x { … }` after an
+    // attribute is a map keyed `when`, and `when = 1` an attribute of that name.
+    _key: ($) =>
+      choice(
+        $.identifier,
+        $.string,
+        alias("each", $.identifier),
+        alias("private", $.identifier),
+        alias("when", $.identifier),
+      ),
 
     _value: ($) =>
       choice(
