@@ -338,3 +338,155 @@ google_folder {
       (attribute
         (identifier)
         (number)))))
+
+==================
+each … as "LABEL": the label of each body is the string, before a when
+==================
+
+google_cloud_identity_group {
+  each spaces by id as "{each.id}_viewers" {
+    display_name = "{each.id}"
+  }
+  each spaces by id as "{each.id}_editors" when editors {
+    display_name = "{each.id}"
+  }
+}
+
+---
+
+(source_file
+  (block
+    (identifier)
+    (body
+      (each
+        (identifier)
+        (identifier)
+        (string
+          (interpolation
+            (parameter))
+          (string_content))
+        (body
+          (attribute
+            (identifier)
+            (string
+              (interpolation
+                (parameter))))))
+      (each
+        (identifier)
+        (identifier)
+        (string
+          (interpolation
+            (parameter))
+          (string_content))
+        (identifier)
+        (body
+          (attribute
+            (identifier)
+            (string
+              (interpolation
+                (parameter)))))))))
+
+==================
+A condition on an attribute, on a block, on a named block and on a labelled resource
+==================
+
+google_storage_bucket {
+  each spaces by id {
+    name = "{each.id}" when each.email
+    encryption when not use_key {
+      default_kms_key_name = key_name
+    }
+    lifecycle_rule first when keep {
+      days = 1
+    }
+  }
+  extra when want_extra {
+    name = "x"
+  }
+}
+
+---
+
+(source_file
+  (block
+    (identifier)
+    (body
+      (each
+        (identifier)
+        (identifier)
+        (body
+          (attribute
+            (identifier)
+            (string
+              (interpolation
+                (parameter)))
+            (condition
+              (identifier)))
+          (block
+            (identifier)
+            (condition
+              (identifier))
+            (body
+              (attribute
+                (identifier)
+                (reference))))
+          (block
+            (identifier)
+            (identifier)
+            (condition
+              (identifier))
+            (body
+              (attribute
+                (identifier)
+                (number))))))
+      (block
+        (identifier)
+        (condition
+          (identifier))
+        (body
+          (attribute
+            (identifier)
+            (string
+              (string_content))))))))
+
+==================
+when is a key where no condition follows: a map named after it, an attribute of that name
+==================
+
+block {
+  a = 1
+  when x {
+    b = 2
+  }
+  c = 3
+  when = 4
+}
+
+use "pack.satz" when gate
+
+---
+
+(source_file
+  (block
+    (identifier)
+    (body
+      (attribute
+        (identifier)
+        (number))
+      (block
+        (identifier)
+        (identifier)
+        (body
+          (attribute
+            (identifier)
+            (number))))
+      (attribute
+        (identifier)
+        (number))
+      (attribute
+        (identifier)
+        (number))))
+  (use_statement
+    (string
+      (string_content))
+    (identifier)))
