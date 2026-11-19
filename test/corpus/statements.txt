@@ -718,10 +718,10 @@ private google_storage_bucket.logs
     (identifier)))
 
 ==================
-request point on a list param
+entries of a list param
 ==================
 
-request shared_vpc_subnets {
+entries shared_vpc_subnets {
   key    = "name"
   fields = ["name", "cidr", "region"]
 }
@@ -729,7 +729,7 @@ request shared_vpc_subnets {
 ---
 
 (source_file
-  (request
+  (entries
     (identifier)
     (body
       (attribute

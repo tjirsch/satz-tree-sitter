@@ -61,7 +61,7 @@ export default grammar({
         $.each_interface,
         $.suppress,
         $.private,
-        $.request,
+        $.entries,
         $.hcl_block,
         $.attribute,
         $.block,
@@ -190,9 +190,9 @@ export default grammar({
     // estate's own file only
     private: ($) => seq("private", field("resource", $.identifier)),
 
-    // request LIST { key = "…" fields = [ … ] description = "…" } — what a team may add to a
-    // list param through a contribution, and the shape of each entry
-    request: ($) => seq("request", field("param", $.identifier), field("body", $.body)),
+    // entries LIST { key = "…" fields = [ … ] description = "…" } — what one entry of a list
+    // param looks like: its key, its fields, their patterns and defaults
+    entries: ($) => seq("entries", field("param", $.identifier), field("body", $.body)),
 
     suppress: ($) =>
       seq(
