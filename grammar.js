@@ -50,6 +50,7 @@ export default grammar({
         $.header,
         $.params,
         $.inputs,
+        $.locals,
         $.use_statement,
         $.claim,
         $.question,
@@ -84,6 +85,9 @@ export default grammar({
     // `inputs { … }`: a template's contract — the same shape as params, bound by the
     // using document or on the command line, emitted as variables
     inputs: ($) => seq("inputs", "{", repeat($.param), "}"),
+    // `locals { … }`: values a file keeps to itself, read by their bare names in that
+    // file only — the same shape as params, never bound and never emitted as variables
+    locals: ($) => seq("locals", "{", repeat($.param), "}"),
     param: ($) => seq(field("name", $.identifier), "=", field("value", $._value)),
 
     // `when` after the path is the statement's gate, never the key of a next entry
