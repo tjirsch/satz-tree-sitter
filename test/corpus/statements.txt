@@ -897,3 +897,30 @@ inputs {
       (list
         (string
           (string_content))))))
+
+==================
+locals
+==================
+
+pack audit
+
+locals {
+  audit_bucket = "{customer_shortname}-audit-logs"
+  retention    = 400
+}
+
+---
+
+(source_file
+  (header
+    (identifier))
+  (locals
+    (param
+      (identifier)
+      (string
+        (interpolation
+          (parameter))
+        (string_content)))
+    (param
+      (identifier)
+      (number))))
