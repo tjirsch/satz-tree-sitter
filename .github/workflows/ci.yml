@@ -27,3 +27,33 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/tjirsch/satz "$RUNNER_TEMP/satz"
           scripts/parse-corpus.sh "$RUNNER_TEMP/satz"
+
+  authors:
+    # Every commit this event adds is authored and committed under a GitHub noreply
+    # address (scripts/check-authors.sh). Only what the event ADDS is judged, never
+    # the history that predates the rule. A pull request: what it adds over its base.
+    # A push to a branch: what the branch adds over main, however often it was
+    # rebased. A push to main: before..sha, the squash commit that merged a pull
+    # request; main is never force-pushed, so a `before` that does not resolve is a
+    # fault and the job refuses it rather than judging less.
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Commit authors are GitHub noreply addresses
+        run: |
+          before="${{ github.event.before }}"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            range="origin/${{ github.base_ref }}..HEAD"
+          elif [ "${{ github.ref }}" != "refs/heads/main" ]; then
+            range="origin/main..${{ github.sha }}"
+          elif git rev-parse -q --verify "$before^{commit}" >/dev/null; then
+            range="$before..${{ github.sha }}"
+          else
+            echo "check-authors: $before, the main this push replaced, does not resolve — main was force-pushed" >&2
+            exit 1
+          fi
+          echo "range: $range"
+          scripts/check-authors.sh --commits "$range"

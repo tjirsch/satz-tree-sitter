@@ -14,6 +14,15 @@ folder and repository `satz-tree-sitter`.
   report no `ERROR`/`MISSING` over every `*.satz` under `presets/` and `tests/`
   (`*.diff.satz` files are diffs and are skipped). A new Satz statement lands here
   before the satz PR that pins the new commit.
+- **Commits carry a GitHub noreply address.** The repository is public, history
+  included. `scripts/check-authors.sh` refuses an author or committer that is not
+  `<id>+<login>@users.noreply.github.com` (GitHub's own `noreply@github.com`
+  committer of a squash merge passes); `$NAMES_IDENT` in the environment allows one
+  more address in a clone, and no personal address is written into the script. The
+  hook runs it on the commit being made — enabled once per clone with
+  `git config core.hooksPath .githooks` — and CI runs it on the commits a pull
+  request or push adds (the `authors` job in `.github/workflows/ci.yml`). Never
+  `--no-verify`.
 - **Example values only.** This repository has no privacy gate; nothing shaped like
   a customer id, domain, project or name goes into `test/corpus/`. Use the values
   of satz's `docs/examples.md`.
