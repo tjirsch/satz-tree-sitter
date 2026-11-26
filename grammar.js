@@ -68,7 +68,8 @@ export default grammar({
         $.block,
       ),
 
-    // estate NAME | pack NAME [version "…"] | interface "NAME" — the last heads an
+    // estate NAME | pack NAME [version "…"] [multiple] | interface "NAME" — `multiple`
+    // lets the pack be used several times, each a named use; the last heads an
     // interface file satz generates for a project: the name alone on its line, then
     // `central`, `output`, `lookup` and `managed` blocks
     header: ($) =>
@@ -77,6 +78,7 @@ export default grammar({
           field("kind", choice("estate", "pack")),
           field("name", $.identifier),
           optional(seq("version", field("version", $.string))),
+          optional(field("multiple", "multiple")),
         ),
         seq(field("kind", "interface"), field("name", $.string)),
       ),
@@ -90,7 +92,8 @@ export default grammar({
     locals: ($) => seq("locals", "{", repeat($.param), "}"),
     param: ($) => seq(field("name", $.identifier), "=", field("value", $._value)),
 
-    // `when` after the path is the statement's gate, never the key of a next entry
+    // `when` after the path is the statement's gate, never the key of a next entry;
+    // `named NAME` makes the use a copy of the pack with params of its own
     use_statement: ($) =>
       prec.right(
         seq(
@@ -99,6 +102,7 @@ export default grammar({
           repeat(
             choice(
               seq("as", field("type", $.identifier)),
+              seq("named", field("named", $.identifier)),
               seq("when", field("condition", $.identifier)),
             ),
           ),

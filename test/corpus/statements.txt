@@ -85,6 +85,49 @@ google_org_policy_policy {
           (string_content))))))
 
 ==================
+Pack header that says multiple
+==================
+
+pack vm version "1.2" multiple
+
+---
+
+(source_file
+  (header
+    (identifier)
+    (string
+      (string_content))))
+
+==================
+A named use and the params that bind it
+==================
+
+use "packs/vm.satz" named web
+use "packs/vm.satz" named db when want_db
+
+params {
+  web.vm_zone = "europe-west3-a"
+}
+
+---
+
+(source_file
+  (use_statement
+    (string
+      (string_content))
+    (identifier))
+  (use_statement
+    (string
+      (string_content))
+    (identifier)
+    (identifier))
+  (params
+    (param
+      (identifier)
+      (string
+        (string_content)))))
+
+==================
 suppress with and without role
 ==================
 
