@@ -27,6 +27,15 @@ tree-sitter test                        # test/corpus/*.txt
 scripts/parse-corpus.sh ~/projects/satz # every .satz file of a satz checkout, zero errors
 ```
 
+Enable the hooks once per clone — they refuse a commit whose author or committer
+is not a GitHub noreply address (`scripts/check-authors.sh`; CI runs the same check
+on every pull request and push):
+
+```sh
+git config core.hooksPath .githooks
+git config user.email <id>+<login>@users.noreply.github.com
+```
+
 A language change in satz is a grammar change here first, then a satz PR that bumps
 the pinned commit in `editors/zed/extension.toml`. CI runs the three commands above
 against a fresh clone of satz, on every push and weekly.

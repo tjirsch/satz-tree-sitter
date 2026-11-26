@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Refuses a commit whose author or committer is not a GitHub noreply address.
+# Enable once per clone:  git config core.hooksPath .githooks
+exec "$(git rev-parse --show-toplevel)/scripts/check-authors.sh" --staged
